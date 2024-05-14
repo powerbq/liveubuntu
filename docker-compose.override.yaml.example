@@ -1,0 +1,6 @@
+version: '3.6'
+
+services:
+  ubuntu:
+    environment:
+      - MAIN_PACKAGE=kubuntu-desktop
