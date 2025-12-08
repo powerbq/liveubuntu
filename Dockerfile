@@ -1,8 +1,8 @@
 FROM scratch
-
 ADD base.tar.gz /
 
-COPY assemble.sh packages.sh save.sh excludes.txt PKGBUILD-* /usr/local/src/build/
+COPY entrypoint/entrypoint.sh /usr/local/src/build/
+COPY excludes.txt PKGBUILD-* /usr/local/src/build/
 COPY hooks/ /etc/initramfs-tools/hooks/
 COPY scripts/ /etc/initramfs-tools/scripts/
 COPY patches/patch-*/ /usr/local/live/patch/
@@ -14,4 +14,4 @@ ENV LC_ALL=C
 
 ENV MAIN_PACKAGE=kubuntu-desktop
 
-ENTRYPOINT ["/usr/local/src/build/assemble.sh"]
+ENTRYPOINT ["/usr/local/src/build/entrypoint.sh"]

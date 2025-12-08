@@ -10,7 +10,6 @@ cd $(dirname $0)
 
 which debootstrap > /dev/null || exit 1
 
-DISTRO=$(cat base.release)
 MIRROR=http://mirrors.kernel.org/ubuntu/
 
 CWD=$(pwd)
@@ -22,7 +21,7 @@ mkdir $TARGET
 
 mkdir -p $CWD/pkg-debootstrap
 
-debootstrap --arch amd64 --cache-dir $CWD/pkg-debootstrap $DISTRO $TARGET $MIRROR
+debootstrap --arch amd64 --cache-dir $CWD/pkg-debootstrap noble $TARGET $MIRROR
 
 cd $TARGET
 tar -zcpf $CWD/base.tar.gz .

@@ -2,6 +2,11 @@
 
 set -e
 
+cd $(dirname $0)
+
+
+# packages
+
 echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/10apt-keep-downloads
 
 echo "deb http://mirrors.kernel.org/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") main restricted universe multiverse" > /etc/apt/sources.list
@@ -73,5 +78,22 @@ apt-get upgrade -y
 apt-get dist-upgrade -y
 apt-get autoremove -y
 
-apt-mark -y minimize-manual
+#apt-mark -y minimize-manual
 update-initramfs -u
+
+
+# save
+
+cd out
+
+FILENAME=live_latest.squashfs
+
+rm -f $FILENAME
+
+mksquashfs / $FILENAME -ef ../excludes.txt -wildcards -no-xattrs -no-progress -comp zstd
+sha256sum $FILENAME > $FILENAME.sha256sum
+
+cat /boot/vmlinuz > vmlinuz
+cat /boot/initrd.img > initrd.img
+
+cd ..

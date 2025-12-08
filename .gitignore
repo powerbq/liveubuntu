@@ -3,9 +3,9 @@
 /pkg-system
 /base.release
 /base.tar.gz
-/.ref
 !/patches/
 /patches/*
 !/patches/patch-common/
 /PKGBUILD-*
 /docker-compose.override.yaml
+/wget-log*
