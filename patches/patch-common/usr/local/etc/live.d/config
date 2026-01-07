@@ -7,7 +7,7 @@ export LC_ALL=C
 # DEFAULT
 export TIMEZONE=Europe/London
 export HOSTNAME=ubuntu
-export LOCALE=ru_UA
+export LOCALE=en_US
 export USERID=3219
 export USERNAME=live
 export PASSWORD=evil

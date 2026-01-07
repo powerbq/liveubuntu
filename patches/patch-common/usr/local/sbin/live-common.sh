@@ -17,4 +17,6 @@ systemctl enable live-sync
 test -f /usr/lib/systemd/system/man-db.timer && systemctl disable man-db.timer
 test -f /usr/lib/systemd/system/casper-md5check.service && systemctl disable casper-md5check.service
 
+rm -f /etc/apt/apt.conf.d/*
+
 exit 0

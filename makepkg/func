@@ -1,0 +1,20 @@
+#!/bin/sh
+
+makedeb() {
+	mkdir -m 755 "$pkgdir/DEBIAN"
+
+	install -D -m644 "$srcdir/control" "$pkgdir/DEBIAN/control"
+	sed -i "s/^Package: .*\$/Package: $pkgname/" "$pkgdir/DEBIAN/control"
+	sed -i "s/^Version: .*\$/Version: $pkgver/" "$pkgdir/DEBIAN/control"
+	sed -i "s/^Description: .*\$/Description: $pkgdesc/" "$pkgdir/DEBIAN/control"
+
+	for SCRIPT in postinst prerm postrm
+	do
+		test -f "$srcdir/$SCRIPT" && install -D -m755 "$srcdir/$SCRIPT" "$pkgdir/DEBIAN/$SCRIPT"
+	done
+
+	mkdir -p $PKGDEST
+	dpkg-deb --build "$pkgdir" "$PKGDEST/${pkgname}_${pkgver}-${pkgrel}_amd64.deb"
+
+	exit $?
+}

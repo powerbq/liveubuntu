@@ -4,14 +4,32 @@ set -e
 
 cd $(dirname $0)
 
+FLAGFILE=.already-run-before
+LOGFILE=/var/log/live-build.log
+DEBOOTSTRAPLOGFILE=/var/log/live-debootstrap.log
 
-# packages
+if test -f $FLAGFILE
+then
+	echo "This container was already run before. Remove it and create new. Exiting..."
+	exit 1
+fi
 
-echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/10apt-keep-downloads
+touch $FLAGFILE
 
-echo "deb http://mirrors.kernel.org/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") main restricted universe multiverse" > /etc/apt/sources.list
-echo "deb http://mirrors.kernel.org/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME")-security main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://mirrors.kernel.org/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME")-updates main restricted universe multiverse" >> /etc/apt/sources.list
+
+(
+
+
+# delete old build
+
+rm -f out/*
+
+
+# save debootstrap cache
+cp --update=older debootstrap/* debootstrap.bak/
+
+
+# install packages
 
 dpkg --add-architecture i386
 
@@ -23,8 +41,7 @@ depends=(
 )
 
 depends+=(
-	linux-image-generic
-	linux-headers-generic
+	linux-generic
 )
 
 depends+=(
@@ -56,33 +73,21 @@ do
 	apt-get install -y ${depends[*]}
 done
 
-for PKG in $(find debs -maxdepth 1 -type f -name '*.deb' | sort)
-do
-	apt install -y $(pwd)/$PKG
-done
+makepkg/run.sh
 
-apt-get install -y gpg software-properties-common wget
+find ./debs -maxdepth 1 -type f -name '*.deb' | sort | xargs -r apt install -y
 
-for SCRIPT in $(find packages.sh.d -maxdepth 1 -type f -name '*.sh' | sort)
-do
-	$SCRIPT
-done
-
-if which check-language-support > /dev/null
-then
-	apt-get install -y $(check-language-support -l ru)
-fi
+find ./packages.sh.d -maxdepth 1 -type f -name '*.sh' | sort | xargs -r -n 1 bash
 
 apt-get update
 apt-get upgrade -y
 apt-get dist-upgrade -y
 apt-get autoremove -y
 
-#apt-mark -y minimize-manual
 update-initramfs -u
 
 
-# save
+# save images
 
 cd out
 
@@ -97,3 +102,29 @@ cat /boot/vmlinuz > vmlinuz
 cat /boot/initrd.img > initrd.img
 
 cd ..
+
+
+# cleanup packages
+
+cd debootstrap.bak
+
+(
+ls | sed 's/%3a/:/g' | awk -F _ '{print $1" "$2}'
+cat $DEBOOTSTRAPLOGFILE | grep '^I: Validating ' | awk '{print $3" "$4}'
+) | sort | uniq -u | xargs -r rm -Rfv
+
+cd /var/cache/apt/archives
+
+(
+grep -oE 'Preparing to unpack \.\.\./[^ ]+'          $LOGFILE | cut -d '/' -f2 | sed -r 's/^[0-9]+-//' | sort -u
+grep -oE 'Preparing to unpack \.\.\./archives/[^ ]+' $LOGFILE | cut -d '/' -f3 | sed -r 's/^[0-9]+-//' | sort -u
+ls | sort -u
+) | sort | uniq -u | xargs -r rm -Rfv
+
+
+) 2>&1 | tee $LOGFILE
+
+
+# save log
+
+cat $DEBOOTSTRAPLOGFILE $LOGFILE > out/build.log

@@ -3,4 +3,4 @@ version: '3.6'
 services:
   ubuntu:
     environment:
-      MAIN_PACKAGE: kubuntu-desktop
+      MAIN_PACKAGE: ubuntu-server
