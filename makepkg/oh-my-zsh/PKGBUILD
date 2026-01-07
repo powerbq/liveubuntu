@@ -1,0 +1,27 @@
+pkgname=oh-my-zsh
+pkgver=1
+pkgrel=1
+arch=(any)
+
+pkgdesc="A delightful community-driven (with 2,400+ contributors) framework for managing your zsh configuration. Includes 300+ optional plugins (rails, git, macOS, hub, docker, homebrew, node, php, python, etc), 140+ themes to spice up your morning, and an auto-update tool that makes it easy to keep up with the latest updates from the community."
+
+source=(
+	control
+	$pkgname::git+https://github.com/ohmyzsh/ohmyzsh.git
+)
+sha256sums=(
+	9bb036541c3801a563e38ed1a84d8b56c77e29c77e14772766ca69a8e3ef4cd6
+	SKIP
+)
+
+package() {
+	mkdir -m 755 -p "$pkgdir/usr/share"
+	cp -a "$srcdir/oh-my-zsh" "$pkgdir/usr/share/$pkgname"
+
+	sed -i "s|^export ZSH=.*$|export ZSH=/usr/share/$pkgname|" "$pkgdir/usr/share/$pkgname"/templates/minimal.zshrc
+	sed -i "s|^export ZSH=.*$|export ZSH=/usr/share/$pkgname|" "$pkgdir/usr/share/$pkgname"/templates/zshrc.zsh-template
+
+	makedeb
+}
+
+source ../func

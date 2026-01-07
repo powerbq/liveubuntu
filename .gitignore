@@ -1,11 +1,10 @@
+/debootstrap/
 /out/
-/pkg-debootstrap
-/pkg-system
-/base.release
-/base.tar.gz
+/pkg/
+/src/
 !/patches/
 /patches/*
 !/patches/patch-common/
+!/patches/patch-oh-my-zsh/
 /PKGBUILD-*
 /docker-compose.override.yaml
-/wget-log*

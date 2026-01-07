@@ -1,4 +1,4 @@
 /.git
-/out
-/pkg-debootstrap
-/pkg-system
+/out/
+/pkg/
+/src/

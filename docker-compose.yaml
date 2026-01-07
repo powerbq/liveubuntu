@@ -7,5 +7,7 @@ services:
       network: host
     network_mode: host
     volumes:
+      - ./debootstrap:/usr/local/src/build/debootstrap.bak
       - ./out:/usr/local/src/build/out
-      - ./pkg-system:/var/cache/apt/archives
+      - ./pkg:/var/cache/apt/archives
+      - ./src:/usr/local/src/build/src

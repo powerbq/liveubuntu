@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if ! test -f /usr/share/oh-my-zsh/templates/zshrc.zsh-template
+then
+	exit 0
+fi
+
+sed -i 's|^#DSHELL=.*$|DSHELL=/bin/zsh|' /etc/adduser.conf
+
+cat /usr/share/oh-my-zsh/templates/zshrc.zsh-template > /etc/skel/.zshrc
+
+exit 0
